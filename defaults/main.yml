@@ -1,0 +1,13 @@
+---
+use_recommended_profile: false
+profile: balanced
+daemon: true
+dynamic_tuning: true
+sleep_interval: 1
+update_interval: 10
+enable_recommend: true
+reapply_sysctl: true
+
+# Tuned legacy has different profile names, this variable maps Tuned profile
+# names to the most appropriate / similar Tuned legacy profile names.
+tuned_legacy_profiles_map: {"balanced": "default", "powersave": "server-powersave"}

@@ -1,0 +1,37 @@
+---
+- name: Install Tuned
+  package: name=tuned state=present
+
+- name: Enable Tuned
+  service: name=tuned state=started enabled=yes
+
+- name: Check for Tuned legacy
+  shell: tuned --version &> /dev/null || echo -n "legacy"
+  register: tversion
+
+- set_fact:
+    tuned_legacy: "{{ (tversion.stdout == 'legacy') | ternary(true,false) }}"
+
+- name: Generate tuned-main.conf file
+  template: src=tuned-main.conf.j2 dest=/etc/tuned/tuned-main.conf
+  notify: restart tuned
+  when: not tuned_legacy
+
+- name: Get Tuned recommended profile
+  shell: tuned-adm recommend 2> /dev/null || echo -n " *fail"
+  register: recommend
+
+- set_fact:
+    tuned_recommended_profile: "{{ (recommend.stdout == ' *fail') | ternary('default',recommend.stdout) }}"
+
+- name: Set Tuned legacy profile {{ tuned_legacy_profiles_map.get(profile, profile) }}
+  command: tuned-adm profile {{ tuned_legacy_profiles_map.get(profile, profile) }}
+  when: tuned_legacy and tuned_legacy_profiles_map.get(profile, profile) != ''
+
+- name: Set Tuned profile {{ profile }}
+  command: tuned-adm profile {{ profile }}
+  when: not tuned_legacy and not use_recommended_profile and profile != ""
+
+- name: Set recommended Tuned profile {{ tuned_recommended_profile }}
+  command: tuned-adm profile {{ tuned_recommended_profile }}
+  when: use_recommended_profile

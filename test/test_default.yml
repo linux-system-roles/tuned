@@ -1,0 +1,23 @@
+
+- name: Ensure the default profile is "balanced"
+  hosts: all
+
+  roles:
+    - tuned
+
+  tasks:
+    - name: Get tuned version
+      command: tuned-adm --version
+      ignore_errors: true
+      register: tuned_version
+
+    - name: Get active profile
+      command: tuned-adm active
+      register: active
+
+    - set_fact:
+        active_profile: "{{ active.stdout_lines[0] | regex_replace('^.*\\: (.*)$', '\\1') }}"
+
+    - assert:
+        # old versions of tuned (which fail with --version) have 'default' as default profile
+        that: "{{ active_profile == ('balanced' if tuned_version.rc == 0 else 'default') }}"

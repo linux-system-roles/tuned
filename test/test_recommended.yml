@@ -1,0 +1,28 @@
+
+- name: Ensure that the recommended profile is set correctly
+  hosts: all
+
+  roles:
+    - name: tuned
+      use_recommended_profile: true
+
+  tasks:
+    - name: Get active profile
+      command: tuned-adm active
+      register: active
+
+    - set_fact:
+        active_profile: "{{ active.stdout_lines[0] | regex_replace('^.*\\: (.*)$', '\\1') }}"
+
+    - name: Get recommended profile
+      command: tuned-adm recommend
+      register: recommend
+      ignore_errors: yes
+
+    # legacy tuned doesn't have the notion of a recommended profile, but should use 'default'
+    - set_fact:
+        recommended_profile: "{{ recommend.stdout if recommend.rc == 0 else 'default' }}"
+
+    - assert:
+        that: "{{ active_profile == recommended_profile }}"
+
