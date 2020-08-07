@@ -8,8 +8,10 @@
 - name: Check for Tuned legacy
   shell: tuned --version &> /dev/null || echo -n "legacy"
   register: tversion
+  changed_when: false
 
-- set_fact:
+- name: Set tuned_legacy boolean
+  set_fact:
     tuned_legacy: "{{ (tversion.stdout == 'legacy') | ternary(true,false) }}"
 
 - name: Generate tuned-main.conf file
@@ -20,8 +22,10 @@
 - name: Get Tuned recommended profile
   shell: tuned-adm recommend 2> /dev/null || echo -n " *fail"
   register: recommend
+  changed_when: false
 
-- set_fact:
+- name: Set recommended profile string
+  set_fact:
     tuned_recommended_profile: "{{ (recommend.stdout == ' *fail') | ternary('default',recommend.stdout) }}"
 
 - name: Set Tuned legacy profile {{ tuned_legacy_profiles_map.get(profile, profile) }}

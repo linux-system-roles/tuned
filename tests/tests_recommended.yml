@@ -9,18 +9,23 @@
     - name: Get active profile
       command: tuned-adm active
       register: active
+      changed_when: false
 
-    - set_fact:
+    - name: Set active_profile string
+      set_fact:
         active_profile: "{{ active.stdout_lines[0] | regex_replace('^.*\\: (.*)$', '\\1') }}"
 
     - name: Get recommended profile
       command: tuned-adm recommend
       register: recommend
       ignore_errors: yes
+      changed_when: false
 
     # legacy tuned doesn't have the notion of a recommended profile, but should use 'default'
-    - set_fact:
+    - name: Set recommended profile string
+      set_fact:
         recommended_profile: "{{ recommend.stdout if recommend.rc == 0 else 'default' }}"
 
-    - assert:
+    - name: Assert that active_profile is the recommended_profile
+      assert:
         that: "{{ active_profile == recommended_profile }}"
