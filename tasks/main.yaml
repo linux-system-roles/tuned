@@ -10,6 +10,10 @@
   register: tversion
   changed_when: false
 
+- name: check register output
+  debug:
+    msg: tversion is {{ tversion | to_nice_json }}
+
 - name: Set tuned_legacy boolean
   set_fact:
     tuned_legacy: "{{ (tversion.stdout == 'legacy') | ternary(true,false) }}"
