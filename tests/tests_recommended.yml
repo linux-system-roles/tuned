@@ -1,4 +1,3 @@
-
 - name: Ensure that the recommended profile is set correctly
   hosts: all
 
@@ -25,4 +24,3 @@
 
     - assert:
         that: "{{ active_profile == recommended_profile }}"
-
