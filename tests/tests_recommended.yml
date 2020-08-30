@@ -3,7 +3,7 @@
   hosts: all
 
   roles:
-    - name: tuned
+    - name: linux-system-roles.tuned
       use_recommended_profile: true
 
   tasks:

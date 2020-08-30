@@ -3,7 +3,7 @@
   hosts: all
 
   roles:
-    - tuned
+    - linux-system-roles.tuned
 
   tasks:
     - name: Get tuned version
