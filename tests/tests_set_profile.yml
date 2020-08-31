@@ -3,7 +3,7 @@
   hosts: all
 
   roles:
-    - name: tuned
+    - name: linux-system-roles.tuned
       profile: balanced
 
   tasks:
