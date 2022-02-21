@@ -8,6 +8,7 @@
 - name: Check for Tuned legacy
   shell: tuned --version &> /dev/null || echo -n "legacy"
   register: tversion
+  check_mode: no
 
 - set_fact:
     tuned_legacy: "{{ (tversion.stdout == 'legacy') | ternary(true,false) }}"
@@ -20,7 +21,8 @@
 - name: Get Tuned recommended profile
   shell: tuned-adm recommend 2> /dev/null || echo -n " *fail"
   register: recommend
-
+  check_mode: no
+  
 - set_fact:
     tuned_recommended_profile: "{{ (recommend.stdout == ' *fail') | ternary('default',recommend.stdout) }}"
 
